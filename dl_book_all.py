@@ -120,3 +120,7 @@ def main():
     # download all bookmarks
     crawl = PixivCrawler(api)
     crawl.dl_book_all(user_id)
+
+
+if __name__ == '__main__':
+    main()
