@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+# -*- coding:utf-8 -*- 3.5.7
 
 from pixivpy3 import *
 import json
@@ -44,9 +44,8 @@ class PixivCrawler(object):
                 next_qs = self.api.parse_qs(json_result.next_url)
                 self.randSleep(0.1)
 
-        df = pd.concat(df_list).rename(columns={'id': 'illust_id'})
-        df['user_id'] = df.user.apply(lambda d: d['id'])
-        return df.set_index('illust_id')
+        df = pd.concat(df_list)
+        return df.reset_index(drop=True)
 
     def download(self, url):
         name = url.split('/')[-1]
@@ -79,12 +78,12 @@ class PixivCrawler(object):
             shutil.rmtree(f'{dir_name}/')
 
     def dl_book_all(self, user_id):
-        df = self.GetUserBookmarks(user_id)
+        df = self.GetUserBookmarks(user_id)[0]
         for i in tqdm(iterable=range(len(df)), desc='download all bookmark'):
-            type_ = df.iat[i, 17]
-            page_count = df.iat[i, 8]
-            meta_single_page = df.iat[i, 7]
-            meta_pages = df.iat[i, 6]
+            type_ = df[i]['type']
+            page_count = df[i]['page_count']
+            meta_single_page = df[i]['meta_single_page']
+            meta_pages = df[i]['meta_pages']
             if page_count != 1:
                 # manga
                 for j in range(page_count):
@@ -120,7 +119,6 @@ def main():
     # download all bookmarks
     crawl = PixivCrawler(api)
     crawl.dl_book_all(user_id)
-
 
 if __name__ == '__main__':
     main()
